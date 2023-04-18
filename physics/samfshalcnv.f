@@ -110,6 +110,7 @@
      &                     cm,      cq,
      &                     es,      etah,    h1,      shevf,
 !    &                     evfact,  evfactl,
+     &                     cthk, cthkmn,
      &                     fact1,   fact2,   factor,  dthk,
      &                     gamma,   pprime,  betaw,   tauadv,
      &                     qlk,     qrch,    qs,
@@ -184,6 +185,7 @@ c  physical parameters
       parameter(clamd=0.1,tkemx=0.65,tkemn=0.05)
       parameter(dtke=tkemx-tkemn)
       parameter(dthk=25.,sfclfac=0.2,rhcrt=0.75)
+      parameter(cthk=200.,cthkmn=0.)
       parameter(cinpcrmx=180.,cinpcrmn=120.)
 !  shevf is an enhancing evaporation factor for shallow convection
       parameter(cinacrmx=-120.,shevf=2.0)
@@ -1212,6 +1214,19 @@ c
         endif
       enddo
       enddo
+
+c     
+c turn off shallow convection if cloud depth is larger than cthk or less than cthkmn               
+c     
+      do i = 1, im
+        if(cnvflg(i)) then
+          tem = pfld(i,kbcon(i))-pfld(i,ktcon(i))
+          if(tem > cthk .or. tem < cthkmn) then
+            cnvflg(i) = .false.
+          endif
+        endif
+      enddo
+
 c
 c  specify upper limit of mass flux at cloud base
 c
